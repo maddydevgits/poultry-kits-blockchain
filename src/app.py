@@ -238,7 +238,23 @@ def retailerdashboard():
             dummy.append(_ckgs[i])
             dummy.append(_cproducttypes[i])
             data1.append(dummy)
-    return render_template('Retailer.html',data1=data1)
+    
+    contract,web3=connectWithBlockchain()
+    _oemails,_oorderids,_oretailers,_ostatuses,_onames,_olcations,_oproducttypes,_okgs=contract.functions.viewOrders().call()
+    data2=[]
+    for i in range(len(_oorderids)):
+        if(_oemails[i]==session['email']):
+            dummy=[]
+            dummy.append(_oemails[i])
+            dummy.append(_ostatuses[i])
+            dummy.append(_oorderids[i])
+            dummy.append(_oretailers[i])
+            dummy.append(_onames[i])
+            dummy.append(_olcations[i])
+            dummy.append(_oproducttypes[i])
+            dummy.append(_okgs[i])
+            data2.append(dummy)
+    return render_template('Retailer.html',data1=data1,data2=data2)
 
 @app.route('/riotplug')
 def riotplug():
@@ -287,7 +303,41 @@ def sendtoAdminFromRetailerForm():
     contract,web3=connectWithBlockchain()
     tx_hash=contract.functions.addOrder(session['email'],wallet,name,location,kgs,producttype).transact()
     web3.eth.waitForTransactionReceipt(tx_hash)
-    return render_template('Retailer.html',res='Order Sent')
+
+    contract,web3=connectWithBlockchain()
+    _oemails,_oorderids,_oretailers,_ostatuses,_onames,_olcations,_oproducttypes,_okgs=contract.functions.viewOrders().call()
+    data2=[]
+    for i in range(len(_oorderids)):
+        if(_oemails[i]==session['email']):
+            dummy=[]
+            dummy.append(_oemails[i])
+            dummy.append(_ostatuses[i])
+            dummy.append(_oorderids[i])
+            dummy.append(_oretailers[i])
+            dummy.append(_onames[i])
+            dummy.append(_olcations[i])
+            dummy.append(_oproducttypes[i])
+            dummy.append(_okgs[i])
+            data2.append(dummy)
+    return render_template('Retailer.html',res='Order Sent',data2=data2)
+
+@app.route('/retailerdata')
+def retailerdata():
+    contract,web3=connectWithBlockchain()
+    _oemails,_oorderids,_oretailers,_ostatuses,_onames,_olcations,_oproducttypes,_okgs=contract.functions.viewOrders().call()
+    data=[]
+    for i in range(len(_oorderids)):
+        dummy=[]
+        dummy.append(_oemails[i])
+        dummy.append(_ostatuses[i])
+        dummy.append(_oorderids[i])
+        dummy.append(_oretailers[i])
+        dummy.append(_onames[i])
+        dummy.append(_olcations[i])
+        dummy.append(_oproducttypes[i])
+        dummy.append(_okgs[i])
+        data.append(dummy)
+    return render_template('retailerdata.html',data1=data)
 
 # Dashboard route
 if __name__ == '__main__':
